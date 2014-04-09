@@ -23,6 +23,10 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
+
+//TODO: speed for different resolutions
+
+
 public class GameThread extends Thread {
 	private SurfaceHolder mHolder = null; // Holder reference
 	boolean running = false; // exits the thread when set false
