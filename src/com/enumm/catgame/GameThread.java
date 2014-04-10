@@ -24,7 +24,7 @@ import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
 
-//TODO: speed for different resolutions
+//TODO: speed for different resolutions - game scale works for upscaling, not downscaling 
 
 
 public class GameThread extends Thread {
