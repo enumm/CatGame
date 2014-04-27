@@ -19,8 +19,8 @@ public abstract class Constants
 		public static final double imageWidth = 1280;
 		public static final double imageHeight = 720;
 		
-		public static final double catWidth = 220;
-		public static final double catHeight = 110;
+		public static final double catWidth = 400;
+		public static final double catHeight = 200;
 		
 		public static final double farbackgroundWidth = 2560;
 		public static final double farbackgroundheight = 720;
@@ -31,7 +31,7 @@ public abstract class Constants
 	
 	public static class Positions
 	{
-		public static final int[] catPossition = {300, 500};
+		public static final int[] catPossition = {300, 487};
 	}
 	public static class ButtonPositions
 	{

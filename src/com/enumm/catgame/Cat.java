@@ -19,20 +19,33 @@ public class Cat {
   {
 	  this.texture = texture;
 	  frame = 0;
-	  maxFrame = texture.length;
+	  maxFrame = texture.length-2;
 	  width = texture[0].getWidth();
 	  height = texture[0].getHeight();
 	  halfWidth = this.width/2;
 	  halfHeight = this.height/2;
   }
   
-  public void animate()
+  public void animate(boolean jump, boolean dash)
   {
-	  frame++;
-	  
-	  if(frame == maxFrame)
+	  if(!jump && !dash)
 	  {
+		  frame++;
+	  
+	  	if(frame >= maxFrame)
+	  	{
 		  frame = 0;
+	  	}
+	  }
+	  
+	  if(jump)
+	  {
+		  frame = 3;
+	  }
+	  
+	  if(dash)
+	  {
+		  frame = 2;
 	  }
   }
   

@@ -100,7 +100,7 @@ public class GameThread extends Thread {
 		sprScore = new Sprite(scaleBitmap(btmScore, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
 		
 		
-		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.background);
+		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
 		farBackground.speed = Constants.Speed.farBackgroundMovementSpeed;
 		
@@ -111,8 +111,10 @@ public class GameThread extends Thread {
 		
 		cat = new Cat(new Bitmap[]
 				{
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.cat), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.cat1), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
+					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakin), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakindu), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.dash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jump2), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
 				});
 		
 		cat.x = (int)(Constants.Positions.catPossition[0]*gameScale[0]);
@@ -298,7 +300,7 @@ public class GameThread extends Thread {
 	
 	private void animateSprites()
 	{
-		cat.animate();
+		cat.animate(jump, dash);
 	}
 	
 	private Bitmap scaleBitmap(Bitmap bitmap, double[] scale, double originalWidth, double originalHeight)
