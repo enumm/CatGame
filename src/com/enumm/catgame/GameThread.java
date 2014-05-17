@@ -31,7 +31,7 @@ public class GameThread extends Thread {
 	private SurfaceHolder mHolder = null; // Holder reference
 	boolean running = false; // exits the thread when set false
 	private long mLastTime = 0; // used for maintaining FPS
-	private int width, height, fps, frameCount, animationCount; // store width and height of canvas,
+	private int width, height, fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount; // store width and height of canvas,
 	
 	public enum State {MENU, ABOUT, SCORE, GAME};
 	
@@ -39,19 +39,22 @@ public class GameThread extends Thread {
 	
 	Bitmap btmScore;
 	Bitmap btmAbout;
-	Bitmap btmMenu;
+	//Bitmap btmMenu;
 	Bitmap[] btmCat;
 	Bitmap btmBackground;
 	Bitmap btmNearBackground;
 	
 	double[] gameScale = new double[2];
 	
+	Sprite burger;
 	Sprite sprScore;
 	Sprite sprAbout;
-	Sprite sprMenu;
+	//Sprite sprMenu;
 	Background farBackground;
 	Background nearBackground;
 	Cat cat;
+	
+	MenuScreen mainMenu;
 	
 	int jumpvelocity;
 	
@@ -90,8 +93,13 @@ public class GameThread extends Thread {
 		gameScale[0] = width / Constants.Size.imageWidth;
 		gameScale[1] = height / Constants.Size.imageHeight;
 		
-		btmMenu = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu);
-		sprMenu = new Sprite(scaleBitmap(btmMenu, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
+		//btmMenu = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu);
+		//sprMenu = new Sprite(scaleBitmap(btmMenu, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
+		mainMenu = new MenuScreen(new Bitmap[]
+				{
+				scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.mainmenu1), gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight),
+			    scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.mainmenu2), gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight)
+				});
 		
 		btmAbout = BitmapFactory.decodeResource(context.getResources(), R.drawable.about);
 		sprAbout = new Sprite(scaleBitmap(btmAbout, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
@@ -99,6 +107,7 @@ public class GameThread extends Thread {
 		btmScore = BitmapFactory.decodeResource(context.getResources(), R.drawable.score);
 		sprScore = new Sprite(scaleBitmap(btmScore, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
 		
+		burger = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight));
 		
 		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
@@ -114,18 +123,21 @@ public class GameThread extends Thread {
 					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakin), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
 					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakindu), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
 					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.dash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jump2), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
+					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jumps), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
 				});
 		
 		cat.x = (int)(Constants.Positions.catPossition[0]*gameScale[0]);
 		cat.y = (int)(Constants.Positions.catPossition[1]*gameScale[1]);
 		
-		Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
-		tekstas.setTypeface(tf);
-		tekstas.setColor(Color.GREEN);
-		tekstas.setTextSize(30);
+		burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+		burger.y = (int)(Constants.Positions.burgerStartingPosition[1]*gameScale[1]);
 		
-		btmMenu.recycle();
+		Typeface tf = Typeface.create("Futura",Typeface.BOLD);
+		tekstas.setTypeface(tf);
+		tekstas.setColor(Color.MAGENTA);
+		tekstas.setTextSize(40);
+		
+		//btmMenu.recycle();
 		btmScore.recycle();
 		btmBackground.recycle();
 		btmAbout.recycle();
@@ -138,6 +150,8 @@ public class GameThread extends Thread {
 		halfJumpTime = Constants.Time.jumpTimeFrames/2;
 		dashTime = 0;
 		dashVelocity = 0;
+		distanceCount = 0;
+		distanceFrameCount = 0;
 		
 		jumpvelocity = (int)((Constants.Lenths.jumpUpHeight/(Constants.Time.jumpTimeFrames/2))*gameScale[1]);
 		
@@ -180,15 +194,8 @@ public class GameThread extends Thread {
 					long now = System.currentTimeMillis();
 
 					this.update();
-					this.draw(c);
-					
-					animationCount++;
-					
-					if (animationCount == Constants.Time.animationChangeOnFrame)
-					{
-						animateSprites();
-						animationCount = 0;
-					}
+					this.draw(c);	
+					this.animateSprites();	
 
 					frameCount++;
 					
@@ -213,12 +220,14 @@ public class GameThread extends Thread {
 	private void update() 
 	{
 		if (state == State.GAME)
-		{
-			farBackground.update(dashVelocity);
-			nearBackground.update(dashVelocity);		
+		{	
+			this.distanceUpdate();
 			
-			jumpLogics();
-			dashLogic();
+			this.farBackground.update(dashVelocity);
+			this.nearBackground.update(dashVelocity);		
+			
+			this.jumpLogics();
+			this.dashLogic();
 		}
 		
 		else if (state == State.MENU)
@@ -253,29 +262,32 @@ public class GameThread extends Thread {
 		}
 	}
 
+	private void distanceUpdate() {
+		distanceFrameCount++;
+		
+		if (distanceFrameCount == Constants.Time.distanceCounterUpdateOnFrame)
+		{
+			distanceCount++;
+			distanceFrameCount = 0;
+		}
+	}
+
 	private void draw(Canvas c) {
 		
 		if(state == State.GAME)
 		{	
-//			c.drawColor(Color.BLACK);
-			
 			farBackground.draw(c);
 			nearBackground.draw(c);
 			
 			cat.draw(c);
-					
+			
+			burger.draw(c);
+				
+			c.drawText("Distance: " + distanceCount + "m", width - 300, 20, tekstas);
+			
 			c.drawText("jump", 50, height - 50, tekstas);
 			c.drawText("dash", width - 100, height - 50, tekstas);
 			
-//			if(jump)
-//			{
-//				c.drawText("jump!!!", width/2 -100, height/2, tekstas);
-//			}
-//			
-//			if(dash)
-//			{
-//				c.drawText("dash!!!", width/2, height/2, tekstas);
-//			}	
 			
 			c.drawText("frameCount= "+ frameCount, 10, 45, tekstas);
 			c.drawText("fps= "+ fps, 10, 20, tekstas);
@@ -284,7 +296,8 @@ public class GameThread extends Thread {
 		
 		else if (state == State.MENU)
 		{
-			sprMenu.draw(c);
+			//sprMenu.draw(c);
+			mainMenu.draw(c);
 		}
 		
 		else if (state == State.ABOUT)
@@ -300,7 +313,27 @@ public class GameThread extends Thread {
 	
 	private void animateSprites()
 	{
-		cat.animate(jump, dash);
+		if (state == State.GAME)
+		{
+			animationCount++;
+			
+			if (animationCount == Constants.Time.animationChangeOnFrame)
+			{
+				cat.animate(jump, dash);
+				animationCount = 0;
+			}
+		}
+		
+		if (state == State.MENU)
+			{
+			menuFrameCount++;
+			
+			if (menuFrameCount == Constants.Time.menuFrameChangeOnFrame)
+			{
+				mainMenu.animate();
+				menuFrameCount = 0;
+			}
+		}
 	}
 	
 	private Bitmap scaleBitmap(Bitmap bitmap, double[] scale, double originalWidth, double originalHeight)
