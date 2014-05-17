@@ -54,6 +54,25 @@ public class Cat {
 	    this.texture = texture;
   }
   
+  public Bitmap getCurrentBitmap()
+  {
+	  return texture[frame];
+  }
+  
+  //TODO: change everywhere to use normal
+  public int getRealX()
+  {
+	  //weru badu
+	  return (int) x - halfWidth;
+  }
+  
+  public int getRealY()
+  {
+	  return (int) y - halfHeight;
+  }
+  
+  
+  
   public int getWidth()
   { 
 	  return this.width; 

@@ -131,8 +131,9 @@ public class GameThread extends Thread {
 		
 		burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
 		burger.y = (int)(Constants.Positions.burgerStartingPosition[1]*gameScale[1]);
+		burger.vx = Constants.Speed.nearBackgroundMovementSpeed;
 		
-		Typeface tf = Typeface.create("Futura",Typeface.BOLD);
+		Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
 		tekstas.setTypeface(tf);
 		tekstas.setColor(Color.MAGENTA);
 		tekstas.setTextSize(40);
@@ -228,6 +229,32 @@ public class GameThread extends Thread {
 			
 			this.jumpLogics();
 			this.dashLogic();
+			
+			//TODO: update to dynamic logics  
+			burger.update(dashVelocity);
+			
+			if (burger.x < -400)
+			{
+				burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+			}
+			
+			//TODO: change burger bitmap size, lots of space
+			
+			if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), cat.getRealX(), cat.getRealY(),
+					burger.getBitmap(), (int)burger.x, (int)burger.y))
+			{
+				if(dash)
+				{
+					burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+				}
+				else
+				{
+					burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+					state = State.MENU;
+				}
+			
+			}
+				
 		}
 		
 		else if (state == State.MENU)
@@ -283,7 +310,7 @@ public class GameThread extends Thread {
 			
 			burger.draw(c);
 				
-			c.drawText("Distance: " + distanceCount + "m", width - 300, 20, tekstas);
+			c.drawText("Distance: " + distanceCount + "m", width - 320, 40, tekstas);
 			
 			c.drawText("jump", 50, height - 50, tekstas);
 			c.drawText("dash", width - 100, height - 50, tekstas);
@@ -291,7 +318,10 @@ public class GameThread extends Thread {
 			
 			c.drawText("frameCount= "+ frameCount, 10, 45, tekstas);
 			c.drawText("fps= "+ fps, 10, 20, tekstas);
-
+			
+			//c.drawRect((int)burger.x, (int)burger.y,(int)burger.x+(int)Constants.Size.burgerWidth, (int)burger.y+(int)Constants.Size.burgerHeight, tekstas);
+			//c.drawRect(cat.getRealX(), cat.getRealY(), cat.getRealX()+(int)Constants.Size.catWidth, cat.getRealY()+(int)Constants.Size.catHeight, tekstas);
+			
 		}
 		
 		else if (state == State.MENU)

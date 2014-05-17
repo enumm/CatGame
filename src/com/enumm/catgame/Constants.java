@@ -59,7 +59,7 @@ public abstract class Constants
 	{
 		public static final int animationChangeOnFrame = 8;
 		public static final int menuFrameChangeOnFrame = 50;
-		public static final int distanceCounterUpdateOnFrame = 60;
+		public static final int distanceCounterUpdateOnFrame = 40;
 		public static final int jumpTimeFrames = 60;
 		public static final int dashTimeFrames = 30;
 	}
