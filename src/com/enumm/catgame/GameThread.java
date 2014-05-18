@@ -127,12 +127,12 @@ public class GameThread extends Thread {
 		
 		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
-		farBackground.speed = Constants.Speed.farBackgroundMovementSpeed;
+		farBackground.speed = (int) (Constants.Speed.farBackgroundMovementSpeed*gameScale[0]);
 		
 		btmNearBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.backgroundnear);
 		nearBackground = new Background(scaleBitmap(btmNearBackground, gameScale, Constants.Size.nearbackgroundWidth, Constants.Size.nearbackgroundheight), this.width);
 		nearBackground.y = height - (int)(Constants.Size.nearbackgroundheight*gameScale[1]);
-		nearBackground.speed = Constants.Speed.nearBackgroundMovementSpeed;
+		nearBackground.speed = (int) (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		cat = new Cat(new Bitmap[]
 				{
@@ -582,17 +582,17 @@ public class GameThread extends Thread {
 		obstacle[0].setBitmap(enemyBitmap);
 		obstacle[0].x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
 		obstacle[0].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
-		obstacle[0].vx = Constants.Speed.nearBackgroundMovementSpeed;
+		obstacle[0].vx = (int) (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[1].setBitmap(enemyBitmap1);
 		obstacle[1].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
 		obstacle[1].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
-		obstacle[1].vx = Constants.Speed.nearBackgroundMovementSpeed;
+		obstacle[1].vx = (int) (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[2].setBitmap(enemyBitmap);
 		obstacle[2].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2));
 		obstacle[2].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
-		obstacle[2].vx = Constants.Speed.nearBackgroundMovementSpeed;
+		obstacle[2].vx = (int) (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 	}
 	
 //	private void drawObstacles(Canvas c) 
