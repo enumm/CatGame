@@ -55,6 +55,7 @@ public class GameThread extends Thread {
 	
 	Enemy[] obstacle;
 	Bitmap enemyBitmap;
+	Bitmap enemyBitmap1;
 	Bitmap friendlyBitmap;
 	
 	Sprite sprScore;
@@ -155,6 +156,7 @@ public class GameThread extends Thread {
 		
 		obstacle = new Enemy[3];
 		enemyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight);
+		enemyBitmap1 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.doge), gameScale, Constants.Size.dogeWidth, Constants.Size.dogeHeight);
 		friendlyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight);
 		
 		initializeObstacles();
@@ -582,7 +584,7 @@ public class GameThread extends Thread {
 		obstacle[0].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[0].vx = Constants.Speed.nearBackgroundMovementSpeed;
 		
-		obstacle[1].setBitmap(enemyBitmap);
+		obstacle[1].setBitmap(enemyBitmap1);
 		obstacle[1].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
 		obstacle[1].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[1].vx = Constants.Speed.nearBackgroundMovementSpeed;

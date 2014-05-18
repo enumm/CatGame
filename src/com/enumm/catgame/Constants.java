@@ -31,6 +31,9 @@ public abstract class Constants
 		public static final double sprinklerWidth = 82;
 		public static final double sprinklerHeight = 165;
 		
+		public static final double dogeWidth = 178;
+		public static final double dogeHeight = 165;
+		
 		public static final double farbackgroundWidth = 2560;
 		public static final double farbackgroundheight = 720;
 		
