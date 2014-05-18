@@ -13,7 +13,7 @@ public class Cat {
   int maxFrame;
   
   private Bitmap texture[];
-  private int width, height, halfWidth, halfHeight;
+  private int width, height;
   
   public Cat(Bitmap[] texture)
   {
@@ -22,8 +22,6 @@ public class Cat {
 	  maxFrame = texture.length-2;
 	  width = texture[0].getWidth();
 	  height = texture[0].getHeight();
-	  halfWidth = this.width/2;
-	  halfHeight = this.height/2;
   }
   
   public void animate(boolean jump, boolean dash)
@@ -59,20 +57,6 @@ public class Cat {
 	  return texture[frame];
   }
   
-  //TODO: change everywhere to use normal
-  public int getRealX()
-  {
-	  //weru badu
-	  return (int) x - halfWidth;
-  }
-  
-  public int getRealY()
-  {
-	  return (int) y - halfHeight;
-  }
-  
-  
-  
   public int getWidth()
   { 
 	  return this.width; 
@@ -85,11 +69,6 @@ public class Cat {
  
   public void draw(Canvas c)
   {  
-	  c.drawBitmap(texture[frame], x - halfWidth, y - halfHeight, null);
+	  c.drawBitmap(texture[frame], x, y, null);
   }
-  
-//  public void draw(Canvas c, Matrix a) 
-//  {
-//	    c.drawBitmap(texture[frame], a, null);
-//  }
 }

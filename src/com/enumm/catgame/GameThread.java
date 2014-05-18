@@ -240,7 +240,7 @@ public class GameThread extends Thread {
 			
 			//TODO: change burger bitmap size, lots of space
 			
-			if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), cat.getRealX(), cat.getRealY(),
+			if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), (int)cat.x, (int)cat.y,
 					burger.getBitmap(), (int)burger.x, (int)burger.y))
 			{
 				if(dash)
