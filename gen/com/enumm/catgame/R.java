@@ -1090,6 +1090,7 @@ containing a value of this type.
         public static final int mainmenu1=0x7f020061;
         public static final int mainmenu2=0x7f020062;
         public static final int score=0x7f020063;
+        public static final int sprinkler=0x7f020064;
     }
     public static final class id {
         public static final int action_bar=0x7f06001c;

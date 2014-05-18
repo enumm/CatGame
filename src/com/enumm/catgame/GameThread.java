@@ -4,6 +4,8 @@ package com.enumm.catgame;
 //import java.util.List;
 //import java.util.Random;
 
+import java.util.Random;
+
 import com.enumm.catgame.R;
 
 import android.content.Context;
@@ -37,6 +39,8 @@ public class GameThread extends Thread {
 	
 	State state = State.MENU;
 	
+	static Random rand;
+	
 	Bitmap btmScore;
 	Bitmap btmAbout;
 	//Bitmap btmMenu;
@@ -46,10 +50,15 @@ public class GameThread extends Thread {
 	
 	double[] gameScale = new double[2];
 	
-	Sprite burger;
+	//Sprite burger;
+	//Sprite enemy;
+	
+	Enemy[] obstacle;
+	Bitmap enemyBitmap;
+	Bitmap friendlyBitmap;
+	
 	Sprite sprScore;
 	Sprite sprAbout;
-	//Sprite sprMenu;
 	Background farBackground;
 	Background nearBackground;
 	Cat cat;
@@ -59,6 +68,8 @@ public class GameThread extends Thread {
 	int jumpvelocity;
 	
 	boolean jump, dash;
+	boolean upgrade = false;
+	
 	int jumpTime, halfJumpTime, dashTime, dashVelocity;
 	
 	private Paint tekstas = new Paint();
@@ -78,6 +89,8 @@ public class GameThread extends Thread {
 		
 		frameCount = fps = 0;
 		animationCount = 0;
+		
+		rand = new Random();
 		
 		WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
 		Display display = wm.getDefaultDisplay();
@@ -107,7 +120,9 @@ public class GameThread extends Thread {
 		btmScore = BitmapFactory.decodeResource(context.getResources(), R.drawable.score);
 		sprScore = new Sprite(scaleBitmap(btmScore, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
 		
-		burger = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight));
+		//burger = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight));
+		
+		//enemy = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight));
 		
 		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
@@ -129,9 +144,20 @@ public class GameThread extends Thread {
 		cat.x = (int)(Constants.Positions.catPossition[0]*gameScale[0]);
 		cat.y = (int)(Constants.Positions.catPossition[1]*gameScale[1]);
 		
-		burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-		burger.y = (int)(Constants.Positions.burgerStartingPosition[1]*gameScale[1]);
-		burger.vx = Constants.Speed.nearBackgroundMovementSpeed;
+//		burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+//		burger.y = (int)(Constants.Positions.burgerStartingPosition[1]*gameScale[1]);
+//		burger.vx = Constants.Speed.nearBackgroundMovementSpeed;
+//		
+//		enemy.x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
+//		enemy.y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
+//		enemy.vx = Constants.Speed.nearBackgroundMovementSpeed;
+		
+		
+		obstacle = new Enemy[3];
+		enemyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight);
+		friendlyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight);
+		
+		initializeObstacles();
 		
 		Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
 		tekstas.setTypeface(tf);
@@ -230,31 +256,8 @@ public class GameThread extends Thread {
 			this.jumpLogics();
 			this.dashLogic();
 			
-			//TODO: update to dynamic logics  
-			burger.update(dashVelocity);
-			
-			if (burger.x < -400)
-			{
-				burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-			}
-			
-			//TODO: change burger bitmap size, lots of space
-			
-			if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), (int)cat.x, (int)cat.y,
-					burger.getBitmap(), (int)burger.x, (int)burger.y))
-			{
-				if(dash)
-				{
-					burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-				}
-				else
-				{
-					burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-					state = State.MENU;
-				}
-			
-			}
-				
+			obsticlesUpdate(distanceCount);
+			executeColission();
 		}
 		
 		else if (state == State.MENU)
@@ -285,8 +288,139 @@ public class GameThread extends Thread {
 		
 		else if(state == State.SCORE)
 		{
+			if (inZone(inputX, inputY, Constants.ButtonPositions.btnRepalyX, Constants.ButtonPositions.btnReplayY))
+			{
+				resetGame();
+				state = State.GAME;				
+			}
 			
+			else if(inZone(inputX, inputY, Constants.ButtonPositions.btnMenuX, Constants.ButtonPositions.btnMenuY))
+			{
+				resetGame();
+				state = State.MENU;	
+			}
+			
+			inputX = 0;
+			inputY = 0;
 		}
+	}
+
+	private void resetGame() {
+		jump= false;
+		dash = false;
+		dashTime = 0;
+		dashVelocity = 0;
+		jumpTime = Constants.Time.jumpTimeFrames;;
+		distanceCount = 0;
+		distanceFrameCount = 0;
+		cat.x = (int)(Constants.Positions.catPossition[0]*gameScale[0]);
+		cat.y = (int)(Constants.Positions.catPossition[1]*gameScale[1]);
+		initializeObstacles();
+	}
+
+	private void obsticlesUpdate(int diffilcuty) 
+	{	
+		if ((diffilcuty%10) == 0)
+		{
+			upgrade = true;
+		}
+		
+		obstacle[0].update(dashVelocity);
+		obstacle[1].update(dashVelocity);
+		obstacle[2].update(dashVelocity);
+		
+		//TODO: add check if unbeatable 
+		
+		if(obstacle[0].x < -400)
+		{
+			obstacle[0].x = (float) (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty);
+		}
+		
+		if(obstacle[1].x < -400)
+		{
+			obstacle[1].x = (float) (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty);
+		}
+		
+		if(obstacle[2].x < -400)
+		{
+			obstacle[2].visible = true;
+			obstacle[2].x = (float) (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty);
+			
+			if (upgrade)
+			{
+				upgrade = false;
+				obstacle[2].friendly = true;
+				obstacle[2].setBitmap(friendlyBitmap);
+			}
+		}
+		
+//		obstacle[0].x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
+//		obstacle[1].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
+//		obstacle[2].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2));
+//		
+		
+		//TODO: update to dynamic logics 
+		
+//		burger.update(dashVelocity);
+//		enemy.update(dashVelocity);
+//		
+//		if (burger.x < -400)
+//		{
+//			burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+//		}
+//		
+//		if (enemy.x < -400)
+//		{
+//			enemy.x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
+//		}
+	}
+	
+	public static int randInt(int min, int max) 
+	{
+	    return rand.nextInt((max - min) + 1) + min;
+	}
+	
+	private void executeColission() 
+	{
+		
+		
+//		if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), (int)cat.x, (int)cat.y,
+//				burger.getBitmap(), (int)burger.x, (int)burger.y))
+//		{
+//			if(dash)
+//			{
+//				burger.x =  (float)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+//			}
+//			else
+//			{
+//				burger.x = (float) (Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
+//				setScoreState();
+//			}
+//		}
+		for(int i = 0 ; i < 3 ;i++)
+		{
+			if(obstacle[i].visible)
+			{
+				if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), (int)cat.x, (int)cat.y, obstacle[i].getBitmap(), (int)obstacle[i].x, (int)obstacle[i].y))
+				{
+					if(obstacle[i].friendly && dash)
+					{
+						obstacle[i].visible = false;
+						obstacle[i].friendly = false;
+						obstacle[i].setBitmap(enemyBitmap);
+					}
+					else
+					{
+						setScoreState();
+					}
+				}
+			}
+		}
+	}
+
+	private void setScoreState() 
+	{
+		state = State.SCORE;
 	}
 
 	private void distanceUpdate() {
@@ -308,20 +442,19 @@ public class GameThread extends Thread {
 			
 			cat.draw(c);
 			
-			burger.draw(c);
+			obstacle[0].draw(c);
+			obstacle[1].draw(c);
+			obstacle[2].draw(c);
+			
+//			burger.draw(c);
+//			enemy.draw(c);
 				
 			c.drawText("Distance: " + distanceCount + "m", width - 320, 40, tekstas);
 			
 			c.drawText("jump", 50, height - 50, tekstas);
 			c.drawText("dash", width - 100, height - 50, tekstas);
 			
-			
-			c.drawText("frameCount= "+ frameCount, 10, 45, tekstas);
 			c.drawText("fps= "+ fps, 10, 20, tekstas);
-			
-			//c.drawRect((int)burger.x, (int)burger.y,(int)burger.x+(int)Constants.Size.burgerWidth, (int)burger.y+(int)Constants.Size.burgerHeight, tekstas);
-			//c.drawRect(cat.getRealX(), cat.getRealY(), cat.getRealX()+(int)Constants.Size.catWidth, cat.getRealY()+(int)Constants.Size.catHeight, tekstas);
-			
 		}
 		
 		else if (state == State.MENU)
@@ -337,7 +470,18 @@ public class GameThread extends Thread {
 		
 		else if(state == State.SCORE)
 		{
+			farBackground.draw(c);
+			nearBackground.draw(c);
+			
+			cat.draw(c);
+			
+			obstacle[0].draw(c);
+			obstacle[1].draw(c);
+			obstacle[2].draw(c);
+			
 			sprScore.draw(c);
+			
+			c.drawText("Distance: " + distanceCount + "m", width/2, height/2, tekstas);
 		}
 	}
 	
@@ -418,6 +562,43 @@ public class GameThread extends Thread {
 			}
 		}
 	}
+	
+	private void initializeObstacles() 
+	{
+		if(obstacle[0] == null)
+		{
+			obstacle[0] = new Enemy();
+		}
+		if(obstacle[1] == null)
+		{
+			obstacle[1] = new Enemy();
+		}
+		if(obstacle[2] == null)
+		{
+			obstacle[2] = new Enemy();
+		}
+		obstacle[0].setBitmap(enemyBitmap);
+		obstacle[0].x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
+		obstacle[0].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
+		obstacle[0].vx = Constants.Speed.nearBackgroundMovementSpeed;
+		
+		obstacle[1].setBitmap(enemyBitmap);
+		obstacle[1].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
+		obstacle[1].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
+		obstacle[1].vx = Constants.Speed.nearBackgroundMovementSpeed;
+		
+		obstacle[2].setBitmap(enemyBitmap);
+		obstacle[2].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2));
+		obstacle[2].y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
+		obstacle[2].vx = Constants.Speed.nearBackgroundMovementSpeed;
+	}
+	
+//	private void drawObstacles(Canvas c) 
+//	{
+//		obstacle[0].draw(c);
+//		obstacle[1].draw(c);
+//		obstacle[2].draw(c);
+//	}
 	
 	public void onTouch(MotionEvent event)
 	{
