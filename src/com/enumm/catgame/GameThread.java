@@ -456,7 +456,7 @@ public class GameThread extends Thread {
 			c.drawText("jump", 50, height - 50, tekstas);
 			c.drawText("dash", width - 100, height - 50, tekstas);
 			
-			c.drawText("fps= "+ fps, 10, 20, tekstas);
+//			c.drawText("fps= "+ fps, 10, 20, tekstas);
 		}
 		
 		else if (state == State.MENU)
@@ -483,7 +483,7 @@ public class GameThread extends Thread {
 			
 			sprScore.draw(c);
 			
-			c.drawText("Distance: " + distanceCount + "m", width/2, height/2, tekstas);
+			c.drawText("Distance: " + distanceCount + "m", width/2 -200, height/2-40, tekstas);
 		}
 	}
 	
