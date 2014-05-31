@@ -19,6 +19,8 @@ public abstract class Constants
 	
 	public static class Size
 	{
+		public static final int textSize = 50;
+		
 		public static final double imageWidth = 1280;
 		public static final double imageHeight = 720;
 		
@@ -46,6 +48,12 @@ public abstract class Constants
 		public static final int[] catPossition = {140, 408};
 		public static final int burgerStartingPosition[] = {(int) (1280 + Constants.Size.burgerWidth), 415};
 		public static final int sprinklerStartingPosition[] = {(int) (1280 + Constants.Size.sprinklerWidth), 415};
+		
+		public static final int[] labelDistance = {950, 40};
+		public static final int[] labelBest = {1040, 80};
+		public static final int[] labelDash = {1135, 650};
+		public static final int[] labelJump = {50, 650};
+		public static final int[] labelScore = {520, 320};
 	}
 	public static class ButtonPositions
 	{

@@ -1,14 +1,11 @@
 package com.enumm.catgame;
 
-//import java.util.ArrayList;
-//import java.util.List;
-//import java.util.Random;
-
 import java.util.Random;
-
 import com.enumm.catgame.R;
-
+import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -25,15 +22,15 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.WindowManager;
 
-
-//TODO: speed for different resolutions - game scale works for upscaling, not downscaling 
-
-
-public class GameThread extends Thread {
+public class GameThread extends Thread 
+{
+	SharedPreferences sp;
+	SharedPreferences.Editor editor;
 	private SurfaceHolder mHolder = null; // Holder reference
 	boolean running = false; // exits the thread when set false
+	boolean recordRun = false;
 	private long mLastTime = 0; // used for maintaining FPS
-	private int width, height, fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount; // store width and height of canvas,
+	private int width, height, fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount, best; // store width and height of canvas,
 	
 	public enum State {MENU, ABOUT, SCORE, GAME};
 	
@@ -48,7 +45,7 @@ public class GameThread extends Thread {
 	Bitmap btmBackground;
 	Bitmap btmNearBackground;
 	
-	double[] gameScale = new double[2];
+	float[] gameScale = new float[2];
 	
 	//Sprite burger;
 	//Sprite enemy;
@@ -84,6 +81,7 @@ public class GameThread extends Thread {
 
 	MediaPlayer mPlayer;
 
+	@SuppressLint("CommitPrefEdits")
 	public GameThread(SurfaceHolder surfaceholder, Context context, Handler handler)
 	{
 		this.mHolder = surfaceholder;
@@ -100,12 +98,15 @@ public class GameThread extends Thread {
 		this.width = size.x;
 		this.height = size.y;
 		
+		sp = context.getSharedPreferences("SuperCatGame", Activity.MODE_PRIVATE);
+		editor = sp.edit();
+		
 		wm = null;
 		display = null;
 		size = null;
 		
-		gameScale[0] = width / Constants.Size.imageWidth;
-		gameScale[1] = height / Constants.Size.imageHeight;
+		gameScale[0] = (float) (width / Constants.Size.imageWidth);
+		gameScale[1] = (float) (height / Constants.Size.imageHeight);
 		
 		//btmMenu = BitmapFactory.decodeResource(context.getResources(), R.drawable.menu);
 		//sprMenu = new Sprite(scaleBitmap(btmMenu, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
@@ -120,11 +121,7 @@ public class GameThread extends Thread {
 			
 		btmScore = BitmapFactory.decodeResource(context.getResources(), R.drawable.score);
 		sprScore = new Sprite(scaleBitmap(btmScore, gameScale, Constants.Size.imageWidth, Constants.Size.imageHeight));
-		
-		//burger = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight));
-		
-		//enemy = new Sprite(scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight));
-		
+
 		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
 		farBackground.speed = (int) (Constants.Speed.farBackgroundMovementSpeed*gameScale[0]);
@@ -145,15 +142,6 @@ public class GameThread extends Thread {
 		cat.x = (int)(Constants.Positions.catPossition[0]*gameScale[0]);
 		cat.y = (int)(Constants.Positions.catPossition[1]*gameScale[1]);
 		
-//		burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-//		burger.y = (int)(Constants.Positions.burgerStartingPosition[1]*gameScale[1]);
-//		burger.vx = Constants.Speed.nearBackgroundMovementSpeed;
-//		
-//		enemy.x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
-//		enemy.y = (int)(Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
-//		enemy.vx = Constants.Speed.nearBackgroundMovementSpeed;
-		
-		
 		obstacle = new Enemy[3];
 		enemyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight);
 		enemyBitmap1 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.doge), gameScale, Constants.Size.dogeWidth, Constants.Size.dogeHeight);
@@ -161,10 +149,11 @@ public class GameThread extends Thread {
 		
 		initializeObstacles();
 		
-		Typeface tf = Typeface.create("Helvetica",Typeface.BOLD);
+		Typeface tf = Typeface.createFromAsset(context.getAssets(), "fonts/super_effective.ttf");
+		
 		tekstas.setTypeface(tf);
-		tekstas.setColor(Color.MAGENTA);
-		tekstas.setTextSize(40);
+		tekstas.setColor(Color.rgb(244, 196, 67));
+		tekstas.setTextSize((float) (Constants.Size.textSize*gameScale[0]));
 		
 		//btmMenu.recycle();
 		btmScore.recycle();
@@ -181,6 +170,7 @@ public class GameThread extends Thread {
 		dashVelocity = 0;
 		distanceCount = 0;
 		distanceFrameCount = 0;
+		best = GetSavedScore();
 		
 		jumpvelocity = (int)((Constants.Lenths.jumpUpHeight/(Constants.Time.jumpTimeFrames/2))*gameScale[1]);
 		
@@ -307,7 +297,9 @@ public class GameThread extends Thread {
 		}
 	}
 
-	private void resetGame() {
+	private void resetGame() 
+	{
+		recordRun = false;
 		jump= false;
 		dash = false;
 		dashTime = 0;
@@ -355,26 +347,6 @@ public class GameThread extends Thread {
 				obstacle[2].setBitmap(friendlyBitmap);
 			}
 		}
-		
-//		obstacle[0].x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
-//		obstacle[1].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
-//		obstacle[2].x = (float) ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2));
-//		
-		
-		//TODO: update to dynamic logics 
-		
-//		burger.update(dashVelocity);
-//		enemy.update(dashVelocity);
-//		
-//		if (burger.x < -400)
-//		{
-//			burger.x = (int)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-//		}
-//		
-//		if (enemy.x < -400)
-//		{
-//			enemy.x = (int)(Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
-//		}
 	}
 	
 	public static int randInt(int min, int max) 
@@ -384,21 +356,6 @@ public class GameThread extends Thread {
 	
 	private void executeColission() 
 	{
-		
-		
-//		if ( CollisionDetection.isCollisionDetected(cat.getCurrentBitmap(), (int)cat.x, (int)cat.y,
-//				burger.getBitmap(), (int)burger.x, (int)burger.y))
-//		{
-//			if(dash)
-//			{
-//				burger.x =  (float)(Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-//			}
-//			else
-//			{
-//				burger.x = (float) (Constants.Positions.burgerStartingPosition[0]*gameScale[0]);
-//				setScoreState();
-//			}
-//		}
 		for(int i = 0 ; i < 3 ;i++)
 		{
 			if(obstacle[i].visible)
@@ -422,6 +379,7 @@ public class GameThread extends Thread {
 
 	private void setScoreState() 
 	{
+		SaveScore(best);
 		state = State.SCORE;
 	}
 
@@ -430,8 +388,19 @@ public class GameThread extends Thread {
 		
 		if (distanceFrameCount == Constants.Time.distanceCounterUpdateOnFrame)
 		{
+			if(recordRun)
+			{
+				best++;
+			}
+			
 			distanceCount++;
 			distanceFrameCount = 0;
+		}
+		
+		if (best < distanceCount)
+		{
+			best = distanceCount;
+			recordRun = true;
 		}
 	}
 
@@ -447,14 +416,12 @@ public class GameThread extends Thread {
 			obstacle[0].draw(c);
 			obstacle[1].draw(c);
 			obstacle[2].draw(c);
-			
-//			burger.draw(c);
-//			enemy.draw(c);
 				
-			c.drawText("Distance: " + distanceCount + "m", width - 320, 40, tekstas);
+			c.drawText("DISTANCE: " + distanceCount + "M", Constants.Positions.labelDistance[0]*gameScale[0], Constants.Positions.labelDistance[1]*gameScale[1], tekstas);
+			c.drawText("BEST: " + best + "M", Constants.Positions.labelBest[0]*gameScale[0], Constants.Positions.labelBest[1]*gameScale[1], tekstas);
 			
-			c.drawText("jump", 50, height - 50, tekstas);
-			c.drawText("dash", width - 100, height - 50, tekstas);
+			c.drawText("JUMP", Constants.Positions.labelJump[0]*gameScale[0], Constants.Positions.labelJump[1]*gameScale[1], tekstas);
+			c.drawText("DASH", Constants.Positions.labelDash[0]*gameScale[0], Constants.Positions.labelDash[1]*gameScale[1], tekstas);
 			
 //			c.drawText("fps= "+ fps, 10, 20, tekstas);
 		}
@@ -483,7 +450,7 @@ public class GameThread extends Thread {
 			
 			sprScore.draw(c);
 			
-			c.drawText("Distance: " + distanceCount + "m", width/2 -200, height/2-40, tekstas);
+			c.drawText("DISTANCE: " + distanceCount + "M", Constants.Positions.labelScore[0]*gameScale[0], Constants.Positions.labelScore[1]*gameScale[1], tekstas);
 		}
 	}
 	
@@ -512,7 +479,7 @@ public class GameThread extends Thread {
 		}
 	}
 	
-	private Bitmap scaleBitmap(Bitmap bitmap, double[] scale, double originalWidth, double originalHeight)
+	private Bitmap scaleBitmap(Bitmap bitmap, float[] scale, double originalWidth, double originalHeight)
 	{
 		return Bitmap.createScaledBitmap(bitmap, (int)(originalWidth*scale[0]), (int)(originalHeight*scale[1]), true);
 	}
@@ -651,5 +618,16 @@ public class GameThread extends Thread {
 		}
 		
 		return false;	
+	}
+	
+	private void SaveScore(int score)
+	{	
+		editor.putInt("Cat_Score", score);
+		editor.commit();
+	}
+	
+	private int GetSavedScore()
+	{	
+		return sp.getInt("Cat_Score", 0);
 	}
 }
