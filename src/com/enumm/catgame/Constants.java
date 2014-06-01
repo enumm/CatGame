@@ -21,33 +21,33 @@ public abstract class Constants
 	{
 		public static final int textSize = 50;
 		
-		public static final double imageWidth = 1280;
-		public static final double imageHeight = 720;
+		public static final float imageWidth = 1280;
+		public static final float imageHeight = 720;
 		
-		public static final double catWidth = 310;
-		public static final double catHeight = 170;
+		public static final float catWidth = 310;
+		public static final float catHeight = 170;
 		
-		public static final double burgerWidth = 178;
-		public static final double burgerHeight = 165;
+		public static final float burgerWidth = 178;
+		public static final float burgerHeight = 165;
 		
-		public static final double sprinklerWidth = 82;
-		public static final double sprinklerHeight = 165;
+		public static final float sprinklerWidth = 82;
+		public static final float sprinklerHeight = 165;
 		
-		public static final double dogeWidth = 178;
-		public static final double dogeHeight = 165;
+		public static final float dogeWidth = 178;
+		public static final float dogeHeight = 165;
 		
-		public static final double farbackgroundWidth = 2560;
-		public static final double farbackgroundheight = 720;
+		public static final float farbackgroundWidth = 2560;
+		public static final float farbackgroundheight = 720;
 		
-		public static final double nearbackgroundWidth = 2560;
-		public static final double nearbackgroundheight = 200;
+		public static final float nearbackgroundWidth = 2560;
+		public static final float nearbackgroundheight = 200;
 	}
 	
 	public static class Positions
 	{
-		public static final int[] catPossition = {140, 408};
-		public static final int burgerStartingPosition[] = {(int) (1280 + Constants.Size.burgerWidth), 415};
-		public static final int sprinklerStartingPosition[] = {(int) (1280 + Constants.Size.sprinklerWidth), 415};
+		public static final float[] catPossition = {140, 408};
+		public static final float burgerStartingPosition[] = {(1280 + Constants.Size.burgerWidth), 415};
+		public static final float sprinklerStartingPosition[] = {(1280 + Constants.Size.sprinklerWidth), 415};
 		
 		public static final int[] labelDistance = {950, 40};
 		public static final int[] labelBest = {1040, 80};

@@ -7,7 +7,7 @@ public class Enemy
 {
 	float x;
 	float y;
-	int vx, vy;
+	float vx, vy;
 	boolean visible;
 	boolean friendly;
 	private Bitmap texture;

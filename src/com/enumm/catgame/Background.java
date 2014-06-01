@@ -8,12 +8,12 @@ public class Background {
   private float x, x2;
   
   int speed;
-  int screenWidth;
+  float screenWidth;
   int textureWidth;
   
   private Bitmap texture;
   
-  public Background(Bitmap texture, int width)
+  public Background(Bitmap texture, float width)
   {
 	  this.texture = texture;
 	  this.screenWidth = width;
@@ -55,7 +55,7 @@ public class Background {
 		}   
   }
   
-  private boolean inScreenBounds(float x, int textureWidth, int screenWidth)
+  private boolean inScreenBounds(float x, int textureWidth, float screenWidth)
   {
 	  if (x + textureWidth >= 0)
 	  {

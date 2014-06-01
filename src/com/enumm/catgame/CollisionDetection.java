@@ -21,8 +21,8 @@ public static boolean isCollisionDetected(Bitmap bitmap1, int x1, int y1, Bitmap
 
     if (Rect.intersects(bounds1, bounds2)) {
         Rect collisionBounds = getCollisionBounds(bounds1, bounds2);
-        for (int i = collisionBounds.left; i < collisionBounds.right; i++) {
-            for (int j = collisionBounds.top; j < collisionBounds.bottom; j++) {
+        for (int i = collisionBounds.left; i < collisionBounds.right; i+=4) {
+            for (int j = collisionBounds.top; j < collisionBounds.bottom; j+=4) {
                 int bitmap1Pixel = bitmap1.getPixel(i-x1, j-y1);
                 int bitmap2Pixel = bitmap2.getPixel(i-x2, j-y2);
                 if (isFilled(bitmap1Pixel) && isFilled(bitmap2Pixel)) {
