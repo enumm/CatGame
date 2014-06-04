@@ -352,19 +352,19 @@ public class GameThread extends Thread
 		if(obstacle[0].x < -400)
 		{
 			obstacle[0].visible = true;
-			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty)*gameScale[0]);
+			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
 		}
 		
 		if(obstacle[1].x < -400)
 		{
 			obstacle[1].visible = true;
-			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty)*gameScale[0]);
+			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
 		}
 		
 		if(obstacle[2].x < -400)
 		{
 			obstacle[2].visible = true;
-			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty)*gameScale[0]);
+			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
 			
 			if (upgrade)
 			{
@@ -619,17 +619,17 @@ public class GameThread extends Thread
 			obstacle[2] = new Enemy();
 		}
 		obstacle[0].setBitmap(enemyBitmap);
-		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + Constants.Lenths.obstaclesOfsset*gameScale[0];
+		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
 		obstacle[0].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[0].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[1].setBitmap(enemyBitmap1);
-		obstacle[1].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]) + Constants.Lenths.obstaclesOfsset*gameScale[0]);
+		obstacle[1].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + (Constants.Lenths.obstaclesOfsset*gameScale[0]) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
 		obstacle[1].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[1].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[2].setBitmap(enemyBitmap);
-		obstacle[2].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2) + Constants.Lenths.obstaclesOfsset*gameScale[0]);
+		obstacle[2].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) +((Constants.Lenths.obstaclesOfsset*gameScale[0])*2) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
 		obstacle[2].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[2].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 	}
@@ -647,13 +647,11 @@ public class GameThread extends Thread
 			for (int p = 0; p < pointerCount; p++) {
 				if (inZone(event.getX(p), event.getY(p), Constants.ButtonPositions.btnJumpX, Constants.ButtonPositions.btnJumpY))
 				{
-					//jump
 					jump = true;
 				}
 				
 				else if(inZone(event.getX(p), event.getY(p), Constants.ButtonPositions.btnDashX, Constants.ButtonPositions.btnDashY))
 				{
-					//dash
 					dash = true;
 				}
 			}		
@@ -665,6 +663,7 @@ public class GameThread extends Thread
 		if(state != State.MENU)
 		{
 			state = State.MENU;
+			resetGame();
 			inputX = 0;
 			inputY = 0;
 		}
