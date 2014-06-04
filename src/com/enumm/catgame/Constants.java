@@ -5,7 +5,7 @@ public abstract class Constants
 	public static class Speed
 	{
 		public static final int farBackgroundMovementSpeed = -2;
-		public static final int nearBackgroundMovementSpeed = -15;
+		public static final int nearBackgroundMovementSpeed = -17;
 		public static final int dashSpeedDivider = 30;
 	}
 	
@@ -13,6 +13,7 @@ public abstract class Constants
 	{
 		public static final int jumpUpHeight = 300;
 		public static final int obstaclesOfsset = 1200;
+		public static final int firstobstaclesOfsset = 1200;
 		public static final int obstaclesRandomOfssetMin = 50;
 		public static final int obstaclesRandomOfssetMax = 200;
 	}

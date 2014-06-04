@@ -7,7 +7,7 @@ public class Background {
   float y = 0;
   private float x, x2;
   
-  int speed;
+  float speed;
   float screenWidth;
   int textureWidth;
   
@@ -40,7 +40,7 @@ public class Background {
 	  }
   }
   
-  public void update(int velocity) 
+  public void update(float velocity) 
   {
 	  	x+= speed + velocity;
 	    x2+= speed + velocity;

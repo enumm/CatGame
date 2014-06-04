@@ -1,7 +1,9 @@
 package com.enumm.catgame;
 
 import java.util.Random;
+
 import com.enumm.catgame.R;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -30,7 +32,7 @@ public class GameThread extends Thread
 	boolean running = false; // exits the thread when set false
 	boolean recordRun = false;
 	private long mLastTime = 0; // used for maintaining FPS
-	private int fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount, best; // store width and height of canvas,
+	private int fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount, best, catState; // store width and height of canvas,
 	
 	float width, height;
 	
@@ -70,7 +72,8 @@ public class GameThread extends Thread
 	boolean jump, dash;
 	boolean upgrade = false;
 	
-	int jumpTime, halfJumpTime, dashTime, dashVelocity;
+	int jumpTime, halfJumpTime, dashTime;
+	float dashVelocity;
 	
 	private Paint tekstas = new Paint();
 	
@@ -124,23 +127,40 @@ public class GameThread extends Thread
 
 		btmBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.bachgroundfar);
 		farBackground = new Background(scaleBitmap(btmBackground, gameScale, Constants.Size.farbackgroundWidth, Constants.Size.farbackgroundheight), this.width);
-		farBackground.speed = (int) (Constants.Speed.farBackgroundMovementSpeed*gameScale[0]);
+		farBackground.speed = (Constants.Speed.farBackgroundMovementSpeed*gameScale[0]);
 		
 		btmNearBackground = BitmapFactory.decodeResource(context.getResources(), R.drawable.backgroundnear);
 		nearBackground = new Background(scaleBitmap(btmNearBackground, gameScale, Constants.Size.nearbackgroundWidth, Constants.Size.nearbackgroundheight), this.width);
 		nearBackground.y = height - Constants.Size.nearbackgroundheight*gameScale[1];
-		nearBackground.speed = (int) (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
+		nearBackground.speed = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		cat = new Cat(new Bitmap[]
-				{
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakin), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakindu), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.dash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
-					scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jumps), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
-				});
+					  {
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakin), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.fakindu), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.dash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jumps), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
+					  },
+					  new Bitmap[]
+					  {
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catprincess1), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+						scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catprincessss2), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+						scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catprincessdash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catprincessjump), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)
+					  },
+					  new Bitmap[]
+					  {
+					    scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catportal1), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					    scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catpotal2), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					    scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catportaldash), gameScale, Constants.Size.catWidth, Constants.Size.catHeight),
+					  	scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.catportaljumps), gameScale, Constants.Size.catWidth, Constants.Size.catHeight)					  
+					  }
+					);
 		
 		cat.x = Constants.Positions.catPossition[0]*gameScale[0];
 		cat.y = Constants.Positions.catPossition[1]*gameScale[1];
+		
+		catState = 0;
 		
 		obstacle = new Enemy[3];
 		enemyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight);
@@ -239,13 +259,12 @@ public class GameThread extends Thread
 	{
 		if (state == State.GAME)
 		{	
+			this.jumpLogics();
+			this.dashLogic();
 			this.distanceUpdate();
 			
 			this.farBackground.update(dashVelocity);
 			this.nearBackground.update(dashVelocity);		
-			
-			this.jumpLogics();
-			this.dashLogic();
 			
 			obsticlesUpdate(distanceCount);
 			executeColission();
@@ -305,6 +324,12 @@ public class GameThread extends Thread
 		dashVelocity = 0;
 		jumpTime = Constants.Time.jumpTimeFrames;;
 		distanceCount = 0;
+		
+		while(!downgradeCat())
+		{
+			
+		}
+		
 		distanceFrameCount = 0;
 		cat.x = (Constants.Positions.catPossition[0]*gameScale[0]);
 		cat.y = (Constants.Positions.catPossition[1]*gameScale[1]);
@@ -322,15 +347,17 @@ public class GameThread extends Thread
 		obstacle[1].update(dashVelocity);
 		obstacle[2].update(dashVelocity);
 		
-		//TODO: add check if unbeatable 
+		//TODO: add check if unbeatable, rewrite....
 		
 		if(obstacle[0].x < -400)
 		{
+			obstacle[0].visible = true;
 			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty)*gameScale[0]);
 		}
 		
 		if(obstacle[1].x < -400)
 		{
+			obstacle[1].visible = true;
 			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) - diffilcuty)*gameScale[0]);
 		}
 		
@@ -363,13 +390,22 @@ public class GameThread extends Thread
 				{
 					if(obstacle[i].friendly && dash)
 					{
+						upgradeCat();
 						obstacle[i].visible = false;
 						obstacle[i].friendly = false;
 						obstacle[i].setBitmap(enemyBitmap);
 					}
 					else
 					{
-						setScoreState();
+						if(catState == 0)
+						{
+							setScoreState();
+						}
+						else
+						{
+							obstacle[i].visible = false;
+							downgradeCat();
+						}
 					}
 				}
 			}
@@ -382,6 +418,44 @@ public class GameThread extends Thread
 		state = State.SCORE;
 	}
 
+	private void upgradeCat() 
+	{
+		if(catState < 2)
+		{
+			catState++;
+			
+			nearBackground.speed -= 2*gameScale[0];
+			
+			obstacle[0].vx -= 2*gameScale[0];
+			obstacle[1].vx -= 2*gameScale[0];
+			obstacle[2].vx -= 2*gameScale[0];
+			
+			cat.setCatState(catState);
+		}
+	}
+	
+	private boolean downgradeCat() 
+	{
+		if(catState != 0)
+		{
+			catState--;
+			cat.setCatState(catState);
+			
+			nearBackground.speed += 2*gameScale[0];
+			
+			obstacle[0].vx += 2*gameScale[0];
+			obstacle[1].vx += 2*gameScale[0];
+			obstacle[2].vx += 2*gameScale[0];
+			
+			return false;
+		}
+		else
+		{	
+			return true;
+		}
+	}
+	
+	
 	private void distanceUpdate() {
 		distanceFrameCount++;
 		
@@ -490,7 +564,7 @@ public class GameThread extends Thread
 				soundPool.play(dashSoundId, 100, 100, 2, 0, 1);
 			}
 			
-			dashVelocity = (((dashTime*dashTime)-Constants.Time.dashTimeFrames*dashTime)/Constants.Speed.dashSpeedDivider);
+			dashVelocity = (((dashTime*dashTime)-Constants.Time.dashTimeFrames*dashTime)/Constants.Speed.dashSpeedDivider)*gameScale[0];
 			
 			if (dashTime == Constants.Time.dashTimeFrames)
 			{
@@ -545,17 +619,17 @@ public class GameThread extends Thread
 			obstacle[2] = new Enemy();
 		}
 		obstacle[0].setBitmap(enemyBitmap);
-		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]);
+		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + Constants.Lenths.obstaclesOfsset*gameScale[0];
 		obstacle[0].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[0].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[1].setBitmap(enemyBitmap1);
-		obstacle[1].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]));
+		obstacle[1].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+(Constants.Lenths.obstaclesOfsset*gameScale[0]) + Constants.Lenths.obstaclesOfsset*gameScale[0]);
 		obstacle[1].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[1].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
 		obstacle[2].setBitmap(enemyBitmap);
-		obstacle[2].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2));
+		obstacle[2].x = ((Constants.Positions.sprinklerStartingPosition[0]*gameScale[0])+((Constants.Lenths.obstaclesOfsset*gameScale[0])*2) + Constants.Lenths.obstaclesOfsset*gameScale[0]);
 		obstacle[2].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[2].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 	}

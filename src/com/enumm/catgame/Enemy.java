@@ -34,7 +34,7 @@ public class Enemy
 		this.texture = texture;
 	}
  
-	public void update(int velocity) 
+	public void update(float velocity) 
 	{
 		x+= vx + velocity;
 	}

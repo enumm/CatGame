@@ -12,16 +12,22 @@ public class Cat {
   int frame;
   int maxFrame;
   
+  private int state;
   private Bitmap texture[];
+  private Bitmap skin1[];
+  private Bitmap skin2[];
   private int width, height;
   
-  public Cat(Bitmap[] texture)
+  public Cat(Bitmap[] texture ,Bitmap[] skin1, Bitmap[] skin2)
   {
 	  this.texture = texture;
+	  this.skin1 = skin1;
+	  this.skin2 = skin2;
 	  frame = 0;
 	  maxFrame = texture.length-2;
 	  width = texture[0].getWidth();
 	  height = texture[0].getHeight();
+	  state = 0;
   }
   
   public void animate(boolean jump, boolean dash)
@@ -47,6 +53,11 @@ public class Cat {
 	  }
   }
   
+  public void setCatState(int state)
+  {
+	    this.state = state;
+  }
+  
   public void updateTexture(Bitmap texture[])
   {
 	    this.texture = texture;
@@ -68,7 +79,18 @@ public class Cat {
   }
  
   public void draw(Canvas c)
-  {  
-	  c.drawBitmap(texture[frame], x, y, null);
+  { 
+	  if(state == 0)
+	  {
+		  c.drawBitmap(texture[frame], x, y, null);  
+	  }
+	  if(state == 1)
+	  {
+		  c.drawBitmap(skin1[frame], x, y, null);  
+	  }  
+	  if(state == 2)
+	  {
+		  c.drawBitmap(skin2[frame], x, y, null);  
+	  }
   }
 }
