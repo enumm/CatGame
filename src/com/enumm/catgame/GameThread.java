@@ -352,19 +352,19 @@ public class GameThread extends Thread
 		if(obstacle[0].x < -400)
 		{
 			obstacle[0].visible = true;
-			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
+			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
 		}
 		
 		if(obstacle[1].x < -400)
 		{
 			obstacle[1].visible = true;
-			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
+			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
 		}
 		
 		if(obstacle[2].x < -400)
 		{
 			obstacle[2].visible = true;
-			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + diffilcuty)*gameScale[0]);
+			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
 			
 			if (upgrade)
 			{
