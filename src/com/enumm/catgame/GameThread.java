@@ -404,7 +404,7 @@ public class GameThread extends Thread
 
 	private void obsticlesUpdate(int diffilcuty) 
 	{	
-		if ((diffilcuty%10) == 0)
+		if ((diffilcuty%50) == 0 && diffilcuty != 0)
 		{
 			upgrade = true;
 		}
