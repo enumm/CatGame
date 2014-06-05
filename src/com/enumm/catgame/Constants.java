@@ -7,7 +7,7 @@ public abstract class Constants
 		public static final int farBackgroundMovementSpeed = -2;
 		public static final int nearBackgroundMovementSpeed = -17;
 		public static final int dashSpeedDivider = 30;
-		public static final float dificultyModifier = 3;
+		public static final float dificultyModifier = 2;
 	}
 	
 	public static class Lenths
@@ -88,5 +88,6 @@ public abstract class Constants
 		public static final int distanceCounterUpdateOnFrame = 30;
 		public static final int jumpTimeFrames = 46;
 		public static final int dashTimeFrames = 30;
+		public static final float songFadeTimeFrames = 60;
 	}
 }

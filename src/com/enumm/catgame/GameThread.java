@@ -31,6 +31,7 @@ public class GameThread extends Thread
 	private SurfaceHolder mHolder = null; // Holder reference
 	boolean running = false; // exits the thread when set false
 	boolean recordRun = false;
+	boolean musicFading = false;
 	private long mLastTime = 0; // used for maintaining FPS
 	private int fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount, best, catState; // store width and height of canvas,
 	
@@ -68,6 +69,7 @@ public class GameThread extends Thread
 	MenuScreen mainMenu;
 	
 	int jumpvelocity;
+	float switchMusic;
 	
 	boolean jump, dash;
 	boolean upgrade = false;
@@ -84,9 +86,10 @@ public class GameThread extends Thread
 	int jumpSoundId;
 	int dashSoundId;
 
-	MediaPlayer mPlayer;
-
-	@SuppressLint("CommitPrefEdits")
+	MediaPlayer menuMusic;
+	MediaPlayer gameMusic;
+	
+	@SuppressLint("CommitPrefEdits") 
 	public GameThread(SurfaceHolder surfaceholder, Context context, Handler handler)
 	{
 		this.mHolder = surfaceholder;
@@ -189,6 +192,7 @@ public class GameThread extends Thread
 		dashVelocity = 0;
 		distanceCount = 0;
 		distanceFrameCount = 0;
+		switchMusic = Constants.Time.songFadeTimeFrames;
 		best = GetSavedScore();
 		
 		jumpvelocity = (int)((Constants.Lenths.jumpUpHeight/(Constants.Time.jumpTimeFrames/2))*gameScale[1]);
@@ -196,14 +200,17 @@ public class GameThread extends Thread
 		jumpSoundId = soundPool.load(context, R.raw.jump, 1);
 		dashSoundId = soundPool.load(context, R.raw.dash, 2);
 		
-		mPlayer = MediaPlayer.create(context, R.raw.music);
+		menuMusic = MediaPlayer.create(context, R.raw.music);
+		gameMusic = MediaPlayer.create(context, R.raw.music1);
 
-		if(mPlayer!= null)
+		if(menuMusic!= null && gameMusic != null)
 	    {
-	        mPlayer.setLooping(true);
-	        mPlayer.setVolume(50,50);
+	        menuMusic.setLooping(true);
+	        menuMusic.setVolume(50,50);
+	        
+	        gameMusic.setLooping(true);
+	        gameMusic.setVolume(50,50);
 	    }
-		
 	}
 	
 	public void doStart()
@@ -212,7 +219,10 @@ public class GameThread extends Thread
 		{
 			mLastTime = System.currentTimeMillis() + 100;
 			running = true;
-			mPlayer.start();
+			
+			menuMusic.start();
+			gameMusic.start();
+			gameMusic.pause();
 		}
 	}
 	
@@ -233,7 +243,8 @@ public class GameThread extends Thread
 
 					this.update();
 					this.draw(c);	
-					this.animateSprites();	
+					this.animateSprites();
+					this.updateMusic();
 
 					frameCount++;
 					
@@ -255,6 +266,55 @@ public class GameThread extends Thread
 		}
 	}
 
+	private void updateMusic()
+	{
+		if(musicFading)
+		{
+			if(switchMusic != 0)
+			{
+				switchMusic--;
+				
+				if(state == State.GAME)
+				{
+					if(!gameMusic.isPlaying())
+					{
+						gameMusic.seekTo(0);
+						gameMusic.start();
+						gameMusic.setVolume(0, 0);
+					}
+					
+					menuMusic.setVolume(switchMusic, switchMusic);
+					gameMusic.setVolume(Constants.Time.songFadeTimeFrames - switchMusic, Constants.Time.songFadeTimeFrames - switchMusic);
+					
+					if(switchMusic == 0)
+					{
+						musicFading = false;
+						menuMusic.pause();
+						switchMusic = Constants.Time.songFadeTimeFrames;
+					}
+				}
+				if(state == State.MENU)
+				{
+					if(!menuMusic.isPlaying())
+					{
+						menuMusic.start();
+						menuMusic.setVolume(0, 0);
+					}
+					
+					gameMusic.setVolume(switchMusic, switchMusic);
+					menuMusic.setVolume(Constants.Time.songFadeTimeFrames - switchMusic, Constants.Time.songFadeTimeFrames - switchMusic);
+					
+					if(switchMusic == 0)
+					{
+						musicFading = false;
+						gameMusic.pause();
+						switchMusic = Constants.Time.songFadeTimeFrames;
+					}
+				}
+			}
+		}		
+	}
+
 	private void update() 
 	{
 		if (state == State.GAME)
@@ -274,6 +334,7 @@ public class GameThread extends Thread
 		{
 			if (inZone(inputX, inputY, Constants.ButtonPositions.btnStartX, Constants.ButtonPositions.btnStartY))
 			{
+				musicFading = true;
 				state = State.GAME;	
 			}
 			
@@ -307,7 +368,8 @@ public class GameThread extends Thread
 			else if(inZone(inputX, inputY, Constants.ButtonPositions.btnMenuX, Constants.ButtonPositions.btnMenuY))
 			{
 				resetGame();
-				state = State.MENU;	
+				state = State.MENU;
+				musicFading = true;
 			}
 			
 			inputX = 0;
