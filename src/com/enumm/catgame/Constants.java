@@ -35,11 +35,11 @@ public abstract class Constants
 		public static final float sprinklerWidth = 82;
 		public static final float sprinklerHeight = 165;
 		
-		public static final float plantWidth = 82;
-		public static final float plantHeight = 80;
+		public static final float plantWidth = 200;
+		public static final float plantHeight = 200;
 		
-		public static final float plant1Width = 82;
-		public static final float plant1Height = 101;
+		public static final float plant1Width = 155;
+		public static final float plant1Height = 153;
 		
 		public static final float dogeWidth = 178;
 		public static final float dogeHeight = 165;
@@ -59,8 +59,8 @@ public abstract class Constants
 		
 		public static final float enemyY = 415;
 		public static final float enemy1Y = 415;
-		public static final float enemy2Y = 500;
-		public static final float enemy3Y = 479;
+		public static final float enemy2Y = 380;
+		public static final float enemy3Y = 427;
 		
 		public static final int[] labelDistance = {950, 40};
 		public static final int[] labelBest = {1040, 80};

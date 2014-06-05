@@ -33,6 +33,7 @@ public class GameThread extends Thread
 	boolean recordRun = false;
 	boolean musicFading = false;
 	private long mLastTime = 0; // used for maintaining FPS
+	@SuppressWarnings("unused")
 	private int fps, frameCount, animationCount, menuFrameCount, distanceCount, distanceFrameCount, best, catState; // store width and height of canvas,
 	
 	float width, height;
@@ -570,8 +571,6 @@ public class GameThread extends Thread
 			
 			c.drawText("JUMP", Constants.Positions.labelJump[0]*gameScale[0], Constants.Positions.labelJump[1]*gameScale[1], tekstas);
 			c.drawText("DASH", Constants.Positions.labelDash[0]*gameScale[0], Constants.Positions.labelDash[1]*gameScale[1], tekstas);
-			
-			c.drawText("fps= "+ fps, 10, 40, tekstas);
 		}
 		
 		else if (state == State.MENU)
