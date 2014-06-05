@@ -58,6 +58,8 @@ public class GameThread extends Thread
 	Enemy[] obstacle;
 	Bitmap enemyBitmap;
 	Bitmap enemyBitmap1;
+	Bitmap enemyBitmap2;
+	Bitmap enemyBitmap3;
 	Bitmap friendlyBitmap;
 	
 	Sprite sprScore;
@@ -168,6 +170,8 @@ public class GameThread extends Thread
 		obstacle = new Enemy[3];
 		enemyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.sprinkler), gameScale, Constants.Size.sprinklerWidth, Constants.Size.sprinklerHeight);
 		enemyBitmap1 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.doge), gameScale, Constants.Size.dogeWidth, Constants.Size.dogeHeight);
+		enemyBitmap2 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.plant), gameScale, Constants.Size.plantWidth, Constants.Size.plantHeight);
+		enemyBitmap3 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.plant1), gameScale, Constants.Size.plant1Width, Constants.Size.plant1Height);
 		friendlyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight);
 		
 		initializeObstacles();
@@ -413,26 +417,36 @@ public class GameThread extends Thread
 		
 		if(obstacle[0].x < -400)
 		{
+			setRandomEnemy(obstacle[0]);
 			obstacle[0].visible = true;
 			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
 		}
 		
 		if(obstacle[1].x < -400)
 		{
+			setRandomEnemy(obstacle[1]);
 			obstacle[1].visible = true;
 			obstacle[1].x = (obstacle[0].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
 		}
 		
 		if(obstacle[2].x < -400)
 		{
+			setRandomEnemy(obstacle[2]);
 			obstacle[2].visible = true;
 			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
+			
+			if(obstacle[2].friendly)
+			{
+				obstacle[2].friendly = false;
+				upgrade = false;
+			}
 			
 			if (upgrade)
 			{
 				upgrade = false;
 				obstacle[2].friendly = true;
 				obstacle[2].setBitmap(friendlyBitmap);
+				obstacle[2].y = (Constants.Positions.enemyY*gameScale[1]);
 			}
 		}
 	}
@@ -516,8 +530,7 @@ public class GameThread extends Thread
 			return true;
 		}
 	}
-	
-	
+		
 	private void distanceUpdate() {
 		distanceFrameCount++;
 		
@@ -680,22 +693,44 @@ public class GameThread extends Thread
 		{
 			obstacle[2] = new Enemy();
 		}
-		obstacle[0].setBitmap(enemyBitmap);
+		
+		setRandomEnemy(obstacle[0]);
 		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
-		obstacle[0].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[0].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
-		obstacle[1].setBitmap(enemyBitmap1);
+		setRandomEnemy(obstacle[1]);
 		obstacle[1].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + (Constants.Lenths.obstaclesOfsset*gameScale[0]) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
-		obstacle[1].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[1].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		
-		obstacle[2].setBitmap(enemyBitmap);
+		setRandomEnemy(obstacle[2]);
 		obstacle[2].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) +((Constants.Lenths.obstaclesOfsset*gameScale[0])*2) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
-		obstacle[2].y = (Constants.Positions.sprinklerStartingPosition[1]*gameScale[1]);
 		obstacle[2].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 	}
 	
+	private void setRandomEnemy(Enemy enemy)
+	{
+		int enemyid = rand.nextInt((3 - 0) + 1) + 0;
+		
+		switch (enemyid) {
+		case 0:
+			enemy.setBitmap(enemyBitmap);
+			enemy.y = (Constants.Positions.enemyY*gameScale[1]);
+			break;
+		case 1:
+			enemy.setBitmap(enemyBitmap1);
+			enemy.y = (Constants.Positions.enemy1Y*gameScale[1]);
+			break;
+		case 2:
+			enemy.setBitmap(enemyBitmap2);
+			enemy.y = (Constants.Positions.enemy2Y*gameScale[1]);
+			break;
+		case 3:
+			enemy.setBitmap(enemyBitmap3);
+			enemy.y = (Constants.Positions.enemy3Y*gameScale[1]);
+			break;
+		}
+	}
+
 	public void onTouch(MotionEvent event)
 	{
 		if (state != State.GAME )
