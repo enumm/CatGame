@@ -26,65 +26,44 @@ public class MainActivity extends Activity {
 		mGameView = new GameView(activity);
 		mGameView.mThread.doStart();
 		setContentView(mGameView);	
-		
-//		final Button btnPlay = (Button) findViewById(R.id.button1);
-//        
-//		btnPlay.setOnClickListener(new  View.OnClickListener() {
-//        	
-//        	public void onClick(View v) {
-//        		activity = this;
-//        		mGameView = new GameView(activity);
-//        		mGameView.mThread.doStart();
-//        		setContentView(mGameView);
-//        	}
-//        });
-//        
-//        final Button btnExit = (Button) findViewById(R.id.button2);
-//        
-//        btnExit.setOnClickListener(new  View.OnClickListener() {
-//        	
-//        	public void onClick(View v) {
-//        		finish();
-//                System.exit(0);
-//        	}
-//        });
 	}
 	
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	public boolean onKeyDown(int keyCode, KeyEvent event) 
+	{
 	    if (keyCode == KeyEvent.KEYCODE_BACK)
 	    {
 	    	mGameView.mThread.onKeyDownBack();    	
 	    	
 	        return true;
 	    }
-	    
+	   
 	    return super.onKeyDown(keyCode, event);
 	}
 	
-//	 @Override
-//	 protected void onPause() {
-//	     // TODO Auto-generated method stub
-//	     super.onPause();
-//	     mGameView.StopView();
-//		 //setContentView(R.layout.activity_main);
-//	 }
+	@Override
+	 protected void onPause() 
+	 {
+		//lewl
+		System.exit(0);
+	 }
 	
+	 @Override
+	 protected void onResume() 
+	 {  
+	     super.onResume();
+	 }
+	 
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-	  try {
-		//mGameView.mThread.onToucha(event);
+	  try 
+	  {
 	    mGameView.mThread.onTouch(event);
-	  } catch(Exception e) {}
+	  } 
+	  catch(Exception e) 
+	  {  
+	  }
 	  
 	  return true;
 	}
-	
-//	@Override
-//	public boolean onCreateOptionsMenu(Menu menu) {
-//		// Inflate the menu; this adds items to the action bar if it is present.
-//		getMenuInflater().inflate(R.menu.main, menu);
-//		return true;
-//	}
-	
 }
