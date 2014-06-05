@@ -1090,17 +1090,19 @@ containing a value of this type.
         public static final int catprincessjump=0x7f020061;
         public static final int catprincessss2=0x7f020062;
         public static final int dash=0x7f020063;
-        public static final int doge=0x7f020064;
-        public static final int fakin=0x7f020065;
-        public static final int fakindu=0x7f020066;
-        public static final int ic_launcher=0x7f020067;
-        public static final int jumps=0x7f020068;
-        public static final int mainmenu1=0x7f020069;
-        public static final int mainmenu2=0x7f02006a;
-        public static final int plant=0x7f02006b;
-        public static final int plant1=0x7f02006c;
-        public static final int score=0x7f02006d;
-        public static final int sprinkler=0x7f02006e;
+        public static final int dashlabel=0x7f020064;
+        public static final int doge=0x7f020065;
+        public static final int fakin=0x7f020066;
+        public static final int fakindu=0x7f020067;
+        public static final int ic_launcher=0x7f020068;
+        public static final int jumplabel=0x7f020069;
+        public static final int jumps=0x7f02006a;
+        public static final int mainmenu1=0x7f02006b;
+        public static final int mainmenu2=0x7f02006c;
+        public static final int plant=0x7f02006d;
+        public static final int plant1=0x7f02006e;
+        public static final int score=0x7f02006f;
+        public static final int sprinkler=0x7f020070;
     }
     public static final class id {
         public static final int action_bar=0x7f06001c;

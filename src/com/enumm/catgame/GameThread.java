@@ -63,6 +63,9 @@ public class GameThread extends Thread
 	Bitmap enemyBitmap3;
 	Bitmap friendlyBitmap;
 	
+	Bitmap jumpLabel;
+	Bitmap dashLabel;
+	
 	Sprite sprScore;
 	Sprite sprAbout;
 	Background farBackground;
@@ -75,6 +78,7 @@ public class GameThread extends Thread
 	float switchMusic;
 	
 	boolean jump, dash;
+	boolean drawjump, drawdash;
 	boolean upgrade = false;
 	
 	int jumpTime, halfJumpTime, dashTime;
@@ -174,6 +178,12 @@ public class GameThread extends Thread
 		enemyBitmap2 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.plant), gameScale, Constants.Size.plantWidth, Constants.Size.plantHeight);
 		enemyBitmap3 = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.plant1), gameScale, Constants.Size.plant1Width, Constants.Size.plant1Height);
 		friendlyBitmap = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.burger), gameScale, Constants.Size.burgerWidth, Constants.Size.burgerHeight);
+		
+		jumpLabel = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.jumplabel), gameScale, Constants.Size.jumpLabelWidth, Constants.Size.jumpLabelHeight);
+		dashLabel = scaleBitmap(BitmapFactory.decodeResource(context.getResources(), R.drawable.dashlabel), gameScale, Constants.Size.dashLabelWidth, Constants.Size.dashLabelHeight);
+		
+		drawjump = true;
+		drawdash = true;
 		
 		initializeObstacles();
 		
@@ -418,6 +428,7 @@ public class GameThread extends Thread
 		
 		if(obstacle[0].x < -400)
 		{
+			obstacle[0].deleteLabel();
 			setRandomEnemy(obstacle[0]);
 			obstacle[0].visible = true;
 			obstacle[0].x = (obstacle[2].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
@@ -432,6 +443,8 @@ public class GameThread extends Thread
 		
 		if(obstacle[2].x < -400)
 		{
+			obstacle[2].deleteLabel();
+			
 			setRandomEnemy(obstacle[2]);
 			obstacle[2].visible = true;
 			obstacle[2].x = (obstacle[1].x + (Constants.Lenths.obstaclesOfsset*gameScale[0]) - (randInt(Constants.Lenths.obstaclesRandomOfssetMin, Constants.Lenths.obstaclesRandomOfssetMax) + (diffilcuty/Constants.Speed.dificultyModifier))*gameScale[0]);
@@ -448,6 +461,12 @@ public class GameThread extends Thread
 				obstacle[2].friendly = true;
 				obstacle[2].setBitmap(friendlyBitmap);
 				obstacle[2].y = (Constants.Positions.enemyY*gameScale[1]);
+				
+				if(drawdash)
+				{
+					obstacle[2].setLabel(dashLabel);
+					drawdash = false;
+				}
 			}
 		}
 	}
@@ -694,6 +713,13 @@ public class GameThread extends Thread
 		}
 		
 		setRandomEnemy(obstacle[0]);
+		
+		if(drawjump)
+		{
+			obstacle[0].setLabel(jumpLabel);	
+			drawjump = false;
+		}
+		
 		obstacle[0].x = (Constants.Positions.sprinklerStartingPosition[0]*gameScale[0]) + Constants.Lenths.firstobstaclesOfsset*gameScale[0];
 		obstacle[0].vx = (Constants.Speed.nearBackgroundMovementSpeed*gameScale[0]);
 		

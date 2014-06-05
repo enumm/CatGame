@@ -2,6 +2,7 @@ package com.enumm.catgame;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 
 public class Enemy 
 {
@@ -11,14 +12,18 @@ public class Enemy
 	boolean visible;
 	boolean friendly;
 	private Bitmap texture;
+	private Bitmap label;
+	private Paint paint = new Paint();
   
 	public Enemy()
 	{
 		visible = true;
 		friendly = false;
 	}
+	
 	public Enemy(Bitmap texture)
 	{
+		label = null;
 		visible = true;
 		friendly = false;
 		this.texture = texture;
@@ -27,6 +32,17 @@ public class Enemy
 	public Bitmap getBitmap()
 	{
 		return texture;
+	}
+	
+	public void setLabel(Bitmap label)
+	{
+		paint.setAlpha(80);
+		this.label = label;
+	}
+	
+	public void deleteLabel()
+	{
+		label = null;
 	}
 	
 	public void setBitmap(Bitmap texture)
@@ -44,6 +60,11 @@ public class Enemy
 		if (visible)
 		{
 			c.drawBitmap(texture, x, y, null);
+			
+			if(label != null)
+			{
+				c.drawBitmap(label, x - Constants.Size.jumpLabelWidth, y, paint);
+			}
 		}
 	}
 }

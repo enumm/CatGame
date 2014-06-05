@@ -21,6 +21,12 @@ public abstract class Constants
 	
 	public static class Size
 	{
+		public static final float jumpLabelWidth = 246;
+		public static final float jumpLabelHeight = 61;
+		
+		public static final float dashLabelWidth = 246;
+		public static final float dashLabelHeight = 61;
+		
 		public static final int textSize = 50;
 		
 		public static final float imageWidth = 1280;
